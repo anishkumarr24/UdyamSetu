@@ -11,6 +11,18 @@ from app.routers import auth as auth_router
 # Create all tables on startup
 Base.metadata.create_all(bind=engine)
 
+# Seed database on startup if empty
+import sys
+from pathlib import Path
+seed_path = str(Path(__file__).parent.parent)
+if seed_path not in sys.path:
+    sys.path.insert(0, seed_path)
+
+try:
+    import seed
+except Exception as e:
+    print(f"Failed to run seed script: {e}")
+
 app = FastAPI(
     title="UdyamSetu API",
     description="Backend for UdyamSetu – NSFDC loan scheme recommendation & management platform",

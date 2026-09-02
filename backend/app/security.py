@@ -19,7 +19,9 @@ from app.database import get_db
 from app import models
 
 # ── Config (mirrors .env values loaded by pydantic-settings in config.py) ─────
-SECRET_KEY = "K8xQ2mLp9VzR4wY7tN6cA1sF5jH3dE8uB0gX9pL2rT6kM"
+import os
+
+SECRET_KEY = os.getenv("K8xQ2mLp9VzR4wY7tN6cA1sF5jH3dE8uB0gX9pL2rT6kM")
 ALGORITHM  = "HS256"
 TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
 

@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from sqlalchemy import text
 from app.database import Base, SessionLocal, engine
-from app.models import Scheme, ChannelPartner, User
+from app.models import Scheme, ChannelPartner, User, LoanApplication
 
 # --------------------------------------------------------------------------- #
 # Bootstrap tables
@@ -162,6 +162,8 @@ existing_schemes = db.query(Scheme).count()
 existing_partners = db.query(ChannelPartner).count()
 existing_users = db.query(User).count()
 
+existing_applications = db.query(LoanApplication).count()
+
 # ── Schemes ──────────────────────────────────────────────────────────────────
 if existing_schemes == 0:
     db.add_all(SCHEMES)
@@ -225,6 +227,40 @@ if existing_users == 0:
     print(f"[OK] Inserted {len(_USER_DATA)} sample users.")
 else:
     print(f"[SKIP] Users already seeded ({existing_users} rows).")
+
+# ── Sample Loan Applications ──────────────────────────────────────────────────
+if existing_applications == 0:
+    all_schemes = db.query(Scheme).all()
+    all_partners = db.query(ChannelPartner).all()
+    all_users = db.query(User).filter(User.role == 'citizen').all()
+
+    if all_schemes and all_partners and all_users:
+        applications = [
+            LoanApplication(
+                id=_uid(),
+                user_id=all_users[0].id,
+                scheme_id=all_schemes[0].id,
+                partner_id=all_partners[0].id,
+                amount=50000.0,
+                tenure_months=24,
+                moratorium_months=3,
+                status="Pending"
+            ),
+            LoanApplication(
+                id=_uid(),
+                user_id=all_users[1].id,
+                scheme_id=all_schemes[1].id,
+                partner_id=all_partners[1].id,
+                amount=120000.0,
+                tenure_months=36,
+                moratorium_months=6,
+                status="Approved"
+            )
+        ]
+        db.add_all(applications)
+        print(f"[OK] Inserted {len(applications)} loan applications.")
+else:
+    print(f"[SKIP] Loan applications already seeded ({existing_applications} rows).")
 
 db.commit()
 db.close()

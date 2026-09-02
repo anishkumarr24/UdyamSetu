@@ -61,7 +61,7 @@ export default function Applications() {
         <select
           value={filter}
           onChange={e => setFilter(e.target.value)}
-          className="px-4 py-2 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="px-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
           <option value="">All statuses</option>
           {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
@@ -98,7 +98,7 @@ export default function Applications() {
                       value={a.status}
                       disabled={updating === a.id}
                       onChange={e => handleStatusChange(a.id, e.target.value)}
-                      className="text-xs px-2 py-1 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-300 disabled:opacity-50"
+                      className="text-xs px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-300 disabled:opacity-50"
                     >
                       {STATUS_OPTIONS.map(s => (
                         <option key={s} value={s}>{s.replace('_', ' ')}</option>

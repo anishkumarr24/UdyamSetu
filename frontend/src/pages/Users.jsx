@@ -51,7 +51,7 @@ export default function Users() {
           placeholder="Search by name, category…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="px-4 py-2 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300 w-64"
+          className="px-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-300 w-64"
         />
       </div>
 

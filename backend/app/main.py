@@ -1,0 +1,48 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.database import Base, engine
+from app.routers import users, schemes, partners, applications
+from app.routers import engine as engine_router
+from app.routers import ocr as ocr_router
+from app.routers import digilocker as digilocker_router
+from app.routers import auth as auth_router
+
+# Create all tables on startup
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="UdyamSetu API",
+    description="Backend for UdyamSetu – NSFDC loan scheme recommendation & management platform",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
+
+# CORS – allow the Vite dev server
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(users.router,        prefix="/api/v1")
+app.include_router(schemes.router,      prefix="/api/v1")
+app.include_router(partners.router,     prefix="/api/v1")
+app.include_router(applications.router, prefix="/api/v1")
+app.include_router(ocr_router.router,        prefix="/api/v1")
+app.include_router(digilocker_router.router, prefix="/api/v1")
+app.include_router(auth_router.router,       prefix="/api/v1")
+app.include_router(engine_router.router)  # mounts at /api/match-scheme, /api/calculate-emi, /api/find-partners
+
+
+@app.get("/", tags=["health"])
+def root():
+    return {"status": "ok", "message": "UdyamSetu API is running"}
+
+
+@app.get("/health", tags=["health"])
+def health():
+    return {"status": "healthy"}

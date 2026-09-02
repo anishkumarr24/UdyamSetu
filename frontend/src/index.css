@@ -1,0 +1,194 @@
+/* Leaflet CSS – must be imported before any component uses react-leaflet */
+@import "leaflet/dist/leaflet.css";
+
+@import "tailwindcss";
+
+/* ─── Tell Tailwind v4 to use the .dark CLASS for dark: variants ─────────────
+   Without this, dark: uses @media (prefers-color-scheme: dark) and ignores
+   the .dark class that ThemeContext.jsx toggles on <html>.                  */
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #f8fafc; /* slate-50 */
+    /* Text color is set via Tailwind utilities on the root div in App.jsx,
+       NOT via inheritance from body — this prevents light/dark bleed. */
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Dark-mode: only override background. Text is handled by dark:text-* utilities. */
+  .dark body {
+    background-color: #0f172a; /* slate-900 */
+  }
+
+  /* Native select <option> legibility in both themes */
+  option {
+    background-color: #ffffff;
+    color: #0f172a;
+  }
+  .dark option {
+    background-color: #1e293b; /* slate-800 */
+    color: #f1f5f9;            /* slate-100 */
+  }
+
+  /* color-scheme hint so browser chrome (scrollbars, native controls) adapts */
+  :root { color-scheme: light; }
+  .dark { color-scheme: dark;  }
+}
+
+/* ─── Custom component styles (Tailwind v4 compatible) ──────────────────── */
+
+/* Card */
+.card {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.07);
+  border: 1px solid #e2e8f0; /* slate-200 */
+  padding: 1.5rem;
+}
+.dark .card {
+  background: #1e293b;   /* slate-800 */
+  border-color: #334155; /* slate-700 */
+}
+
+/* Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  background-color: #1d4ed8;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms, transform 150ms;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.08);
+}
+.btn-primary:hover   { background-color: #1e40af; }
+.btn-primary:active  { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid #1d4ed8;
+  color: #1d4ed8;
+  font-weight: 600;
+  font-size: 0.875rem;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 150ms, transform 150ms;
+}
+.btn-outline:hover          { background-color: #eff6ff; }
+.dark .btn-outline          { border-color: #3b82f6; color: #93c5fd; }
+.dark .btn-outline:hover    { background-color: #1e3a8a; }
+.btn-outline:active         { transform: scale(0.97); }
+.btn-outline:disabled       { opacity: 0.55; cursor: not-allowed; }
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+/* Light-mode: high contrast on pastel backgrounds */
+.badge-green  { background: #dcfce7; color: #15803d; }
+.badge-red    { background: #fee2e2; color: #b91c1c; }
+.badge-yellow { background: #fef9c3; color: #854d0e; }
+.badge-blue   { background: #dbeafe; color: #1d4ed8; }
+.badge-purple { background: #ede9fe; color: #6d28d9; }
+.badge-gray   { background: #f1f5f9; color: #475569; }
+/* Dark-mode badges: deeper bg, brighter text for WCAG AA */
+.dark .badge-green  { background: #14532d33; color: #4ade80; }
+.dark .badge-red    { background: #7f1d1d33; color: #f87171; }
+.dark .badge-yellow { background: #78350f33; color: #fbbf24; }
+.dark .badge-blue   { background: #1e3a8a33; color: #60a5fa; }
+.dark .badge-purple { background: #4c1d9533; color: #a78bfa; }
+.dark .badge-gray   { background: #1e293b;   color: #94a3b8; }
+
+/* Table container */
+.table-container {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0; /* slate-200 */
+}
+.dark .table-container {
+  border-color: #334155; /* slate-700 */
+}
+
+/* Data table */
+.data-table {
+  width: 100%;
+  font-size: 0.875rem;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+/* thead: clearly offset from body in BOTH themes, WCAG AA contrast ✓ */
+.data-table thead {
+  background-color: #f1f5f9; /* slate-100 */
+  color: #475569;             /* slate-600 – 4.7:1 on slate-100 */
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+.dark .data-table thead {
+  background-color: #334155; /* slate-700 */
+  color: #cbd5e1;             /* slate-300 – 6.4:1 on slate-700 */
+}
+
+.data-table th {
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+}
+
+.data-table td {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #f1f5f9; /* slate-100 */
+  color: #1e293b;                 /* slate-800 */
+}
+.dark .data-table td {
+  border-top-color: #1e293b; /* slate-800 */
+  color: #e2e8f0;             /* slate-200 */
+}
+
+/* tbody rows: explicit white bg in light mode so they never inherit a dark colour */
+.data-table tbody tr {
+  background-color: #ffffff;
+}
+.dark .data-table tbody tr {
+  background-color: #1e293b; /* slate-800 */
+}
+
+.data-table tr:hover td {
+  background-color: #eff6ff55;
+  transition: background-color 100ms;
+}
+.dark .data-table tr:hover td {
+  background-color: #1e293b88;
+}
+
+/* Leaflet map – clean border framing, NO tile color-inversion.
+   Dark tiles are loaded via CartoDb dark URLs in the JSX component. */
+.leaflet-container {
+  border-radius: inherit;
+}

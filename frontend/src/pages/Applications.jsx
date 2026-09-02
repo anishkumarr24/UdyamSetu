@@ -22,17 +22,17 @@ function fmtDate(d) {
 
 export default function Applications() {
   const [apps, setApps]       = useState([])
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError]     = useState(null)
   const [filter, setFilter]   = useState('')
   const [updating, setUpdating] = useState(null)
 
   const load = () => {
-    setLoading(true)
+    setIsLoading(true)
     getApplications(filter ? { status: filter } : {})
       .then(setApps)
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false))
+      .catch(e => setError(e?.message || 'Error fetching data'))
+      .finally(() => setIsLoading(false))
   }
 
   useEffect(load, [filter])
@@ -41,7 +41,7 @@ export default function Applications() {
     setUpdating(id)
     try {
       const updated = await updateApplicationStatus(id, status)
-      setApps(prev => prev.map(a => a.id === id ? updated : a))
+      setApps(prev => prev?.map(a => a.id === id ? updated : a))
     } catch (e) {
       alert('Failed to update status: ' + e.message)
     } finally {
@@ -68,8 +68,8 @@ export default function Applications() {
         </select>
       </div>
 
-      {loading ? <LoadingSpinner /> : apps.length === 0 ? (
-        <EmptyState title="No applications found" description="Submit applications via the API." />
+      {isLoading ? <div>Loading data...</div> : (!apps || apps.length === 0) ? (
+        <div>No records found</div>
       ) : (
         <div className="table-container">
           <table className="data-table">
@@ -85,7 +85,7 @@ export default function Applications() {
               </tr>
             </thead>
             <tbody>
-              {apps.map(a => (
+              {apps?.map(a => (
                 <tr key={a.id}>
                   <td className="font-mono text-xs text-slate-400">{a.id.slice(0, 8)}…</td>
                   <td className="font-semibold">{fmt(a.amount)}</td>

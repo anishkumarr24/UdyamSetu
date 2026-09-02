@@ -13,15 +13,15 @@ const PARTNER_TYPE_COLORS = {
 export default function Partners() {
   const [partners, setPartners] = useState([])
   const [activeOnly, setActiveOnly] = useState(false)
-  const [loading, setLoading]  = useState(true)
+  const [isLoading, setIsLoading]  = useState(true)
   const [error, setError]      = useState(null)
 
   const load = (active) => {
-    setLoading(true)
+    setIsLoading(true)
     getPartners(active)
       .then(setPartners)
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false))
+      .catch(e => setError(e?.message || 'Error fetching data'))
+      .finally(() => setIsLoading(false))
   }
 
   useEffect(() => { load(activeOnly) }, [activeOnly])
@@ -46,8 +46,8 @@ export default function Partners() {
         </label>
       </div>
 
-      {loading ? <LoadingSpinner /> : !partners || partners.length === 0 ? (
-        <EmptyState title="No partners found" description="Run seed.py to populate the database." />
+      {isLoading ? <div>Loading data...</div> : (!partners || partners.length === 0) ? (
+        <div>No records found</div>
       ) : (
         <div className="table-container">
           <table className="data-table">
@@ -84,7 +84,7 @@ export default function Partners() {
                           ? 'text-yellow-600 dark:text-yellow-400'
                           : 'text-green-600 dark:text-green-400'
                     }`}>
-                      {p.npa_percentage.toFixed(1)}%
+                      {p.npa_percentage?.toFixed(1)}%
                     </span>
                   </td>
                   <td>

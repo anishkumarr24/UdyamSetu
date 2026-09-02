@@ -20,21 +20,21 @@ function fmt(n) {
 
 export default function Users() {
   const [users, setUsers]   = useState([])
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError]   = useState(null)
   const [search, setSearch] = useState('')
 
   useEffect(() => {
     getUsers()
       .then(setUsers)
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false))
+      .catch(e => setError(e?.message || 'Error fetching data'))
+      .finally(() => setIsLoading(false))
   }, [])
 
-  const filtered = users.filter(u =>
-    u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.category.toLowerCase().includes(search.toLowerCase()) ||
-    u.project_domain.toLowerCase().includes(search.toLowerCase())
+  const filtered = (users || []).filter(u =>
+    u.name?.toLowerCase().includes(search.toLowerCase()) ||
+    u.category?.toLowerCase().includes(search.toLowerCase()) ||
+    u.project_domain?.toLowerCase().includes(search.toLowerCase())
   )
 
   if (error) return <ErrorAlert message={error} />
@@ -55,8 +55,8 @@ export default function Users() {
         />
       </div>
 
-      {loading ? <LoadingSpinner /> : filtered.length === 0 ? (
-        <EmptyState title="No beneficiaries found" description="Create users via the API or adjust your search." />
+      {isLoading ? <div>Loading data...</div> : (!filtered || filtered.length === 0) ? (
+        <div>No records found</div>
       ) : (
         <div className="table-container">
           <table className="data-table">
@@ -73,7 +73,7 @@ export default function Users() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(u => (
+              {filtered?.map(u => (
                 <tr key={u.id}>
                   <td className="font-medium text-slate-800">{u.name}</td>
                   <td className="text-slate-500">{u.age} · {u.gender}</td>
@@ -86,7 +86,7 @@ export default function Users() {
                       u.readiness_score >= 70 ? 'text-green-600' :
                       u.readiness_score >= 40 ? 'text-yellow-600' : 'text-red-500'
                     }`}>
-                      {u.readiness_score.toFixed(0)}
+                      {u.readiness_score?.toFixed(0)}
                     </span>
                   </td>
                   <td>

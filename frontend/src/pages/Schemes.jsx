@@ -10,17 +10,17 @@ function fmt(n) {
 
 export default function Schemes() {
   const [schemes, setSchemes] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError]     = useState(null)
 
   useEffect(() => {
     getSchemes()
       .then(setSchemes)
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false))
+      .catch(e => setError(e?.message || 'Error fetching data'))
+      .finally(() => setIsLoading(false))
   }, [])
 
-  if (loading) return <LoadingSpinner />
+  if (isLoading) return <div>Loading data...</div>
   if (error)   return <ErrorAlert message={error} />
 
   return (
@@ -30,11 +30,11 @@ export default function Schemes() {
         <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">NSFDC financial assistance programmes</p>
       </div>
 
-      {schemes.length === 0 ? (
-        <EmptyState title="No schemes found" description="Run seed.py to populate the database." />
+      {(!schemes || schemes.length === 0) ? (
+        <div>No records found</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {schemes.map(s => (
+          {schemes?.map(s => (
             <div key={s.id} className="card flex flex-col gap-4 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between gap-2">
                 <h2 className="font-bold text-slate-800 dark:text-slate-100 leading-snug">{s.name}</h2>

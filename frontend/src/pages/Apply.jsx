@@ -391,16 +391,7 @@ function Step3({ form, onBack }) {
                 </div>
               )}
 
-              <div className="flex items-center gap-4 pt-2">
-                <button className="btn-primary py-3 px-6 text-base gap-2">
-                  <FileCheck size={18} />
-                  {t('proceedBtn')}
-                  <ChevronRight size={16} />
-                </button>
-                <p className="text-xs text-slate-500 dark:text-slate-500">
-                  {t('proceedSub')}
-                </p>
-              </div>
+
             </>
           )}
         </>

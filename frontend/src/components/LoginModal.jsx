@@ -41,7 +41,7 @@ export default function LoginModal({ isOpen, onClose }) {
     focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-500 transition placeholder-slate-400 dark:placeholder-slate-500`
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-2xl">
         <button
           onClick={onClose}

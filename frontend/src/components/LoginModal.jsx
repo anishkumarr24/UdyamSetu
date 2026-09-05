@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '../context/AuthContext'
 import { X, Loader2 } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
@@ -40,7 +41,7 @@ export default function LoginModal({ isOpen, onClose }) {
   const inputCls = `w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100
     focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-500 transition placeholder-slate-400 dark:placeholder-slate-500`
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-2xl">
         <button
@@ -144,6 +145,7 @@ export default function LoginModal({ isOpen, onClose }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

@@ -8,7 +8,7 @@ import { useLanguage } from '../context/LanguageContext'
 import {
   ChevronRight, ChevronLeft,
   CheckCircle2, AlertTriangle, ExternalLink, BadgePercent,
-  FileCheck, Loader2, X,
+  Loader2, X,
 } from 'lucide-react'
 import {
   RadialBarChart, RadialBar, PolarAngleAxis, ResponsiveContainer,
@@ -103,30 +103,10 @@ function ScoreGauge({ score }) {
 function Step1({ form, setForm, onNext }) {
   const { t } = useLanguage()
 
-  const simulateOcr = () => {
-    setForm(f => ({
-      ...f,
-      name: 'Rajesh Kumar',
-      age: 29,
-      gender: 'Male',
-      category: 'SC',
-      annual_income: 180000,
-      has_caste_cert: true,
-      has_income_cert: true,
-    }))
-  }
-
   const valid = form.name && form.age && form.gender && form.category && form.annual_income
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <button onClick={simulateOcr} className="btn-outline text-xs py-1.5 flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800">
-          <FileCheck size={14} />
-          {t('autoFillOcr') || "Simulate Document Upload"}
-        </button>
-      </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label={t('fullName')} required>
           <input className={inputCls} placeholder="e.g. Rajesh Kumar"

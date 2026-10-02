@@ -18,10 +18,8 @@ pydantic[email]
 python-jose[cryptography]
 passlib[bcrypt]
 
-# File handling & OCR
+# Form data handling
 python-multipart>=0.0.9
-pytesseract
-pillow
 
 # ML utilities
 scikit-learn

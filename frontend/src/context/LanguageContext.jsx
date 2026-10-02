@@ -14,13 +14,6 @@ const translations = {
     theme: "Theme",
     
     // Apply.jsx
-    smartProfileTitle: "Smart Profile & Document Ingestion",
-    smartProfileDesc: "Upload your documents and let AI extract your details automatically.",
-    dragDropText: "Drag & drop Identity / Income documents",
-    dragDropSub: "PDF, JPG, PNG · Aadhaar, PAN, Caste & Income Certificates",
-    autoFillOcr: "Auto-Fill with AI OCR",
-    scanningDocs: "Scanning documents…",
-    profileFilled: "Profile auto-filled successfully!",
     fullName: "Full Name",
     age: "Age",
     gender: "Gender",
@@ -157,13 +150,6 @@ const translations = {
     theme: "थीम",
     
     // Apply.jsx
-    smartProfileTitle: "स्मार्ट प्रोफाइल और दस्तावेज़ अंतर्ग्रहण",
-    smartProfileDesc: "अपने दस्तावेज़ अपलोड करें और AI को स्वचालित रूप से आपका विवरण निकालने दें।",
-    dragDropText: "पहचान / आय दस्तावेज़ यहाँ खींचें और छोड़ें",
-    dragDropSub: "PDF, JPG, PNG · आधार, पैन, जाति और आय प्रमाण पत्र",
-    autoFillOcr: "AI OCR से स्वतः भरें",
-    scanningDocs: "दस्तावेज़ स्कैन हो रहे हैं…",
-    profileFilled: "प्रोफाइल सफलतापूर्वक भर गया!",
     fullName: "पूरा नाम",
     age: "आयु",
     gender: "लिंग",

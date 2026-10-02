@@ -19,6 +19,7 @@ import {
 import { jsPDF } from 'jspdf'
 import { useLanguage } from '../context/LanguageContext'
 import { useTheme } from '../context/ThemeContext'
+import { useAuth } from '../context/AuthContext'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -117,13 +118,15 @@ function Slider({ label, min, max, step, value, onChange, format }) {
   )
 }
 
-function MoratoriumVisualizer() {
+function MoratoriumVisualizer({
+  principal, setPrincipal,
+  tenure, setTenure,
+  moratorium, setMoratorium,
+  emiData, setEmiData,
+  onEmiChange
+}) {
   const { t } = useLanguage()
   const { theme } = useTheme()
-  const [principal,   setPrincipal]   = useState(50000)
-  const [tenure,      setTenure]      = useState(24)
-  const [moratorium,  setMoratorium]  = useState(3)
-  const [emiData,     setEmiData]     = useState(null)
   const [loading,     setLoading]     = useState(false)
   const debounceRef = useRef(null)
 
@@ -137,13 +140,14 @@ function MoratoriumVisualizer() {
         tenure_months: t,
         moratorium_months: m,
       })
-      setEmiData(data)
+      setEmiData?.(data)
+      onEmiChange?.(data)
     } catch (e) {
       console.error('EMI fetch error', e)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [setEmiData, onEmiChange])
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -335,7 +339,7 @@ function GISMap({ selectedBank, setSelectedBank, onPartnersLoaded }) {
   )
 }
 
-async function downloadDossier({ principal, tenure, moratorium, emiData, selectedBankName }) {
+async function downloadDossier({ principal, tenure, moratorium, emiData, selectedBankName, user }) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const W = 210, PL = 18, PT = 22
   let y = PT
@@ -373,10 +377,10 @@ async function downloadDossier({ principal, tenure, moratorium, emiData, selecte
   }
 
   section('Beneficiary Profile')
-  row('Applicant Name', 'Rajesh Kumar', true)
-  row('Category', 'SC (Scheduled Caste)')
-  row('Annual Income', fmt(180000))
-  row('Project Domain', 'Tailoring / Self-Employment')
+  row('Applicant Name', user?.name || 'Rajesh Kumar', true)
+  row('Category', user?.category ? `${user.category} (Scheduled Caste)` : 'SC (Scheduled Caste)')
+  row('Annual Income', fmt(user?.annual_income || 180000))
+  row('Project Domain', user?.project_domain && !user?.project_domain.startsWith('__email__') ? user.project_domain : 'Tailoring / Self-Employment')
   y += 2
 
   section('Matched NSFDC Scheme')
@@ -416,6 +420,7 @@ async function downloadDossier({ principal, tenure, moratorium, emiData, selecte
 }
 
 export default function CitizenDashboard() {
+  const { user } = useAuth()
   const [principal,        setPrincipal]        = useState(50000)
   const [tenure,           setTenure]           = useState(24)
   const [moratorium,       setMoratorium]        = useState(3)
@@ -432,6 +437,7 @@ export default function CitizenDashboard() {
       await downloadDossier({
         principal, tenure, moratorium, emiData,
         selectedBankName: sel?.name ?? 'Not selected',
+        user,
       })
     } finally {
       setDownloading(false)
@@ -461,6 +467,14 @@ export default function CitizenDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         <MoratoriumVisualizer
+          principal={principal}
+          setPrincipal={setPrincipal}
+          tenure={tenure}
+          setTenure={setTenure}
+          moratorium={moratorium}
+          setMoratorium={setMoratorium}
+          emiData={emiData}
+          setEmiData={setEmiData}
           onEmiChange={setEmiData}
         />
         <GISMap

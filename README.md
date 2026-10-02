@@ -9,7 +9,7 @@ UdyamSetu is a next-generation platform designed to bridge the gap between margi
 ## 🚀 The Tech Stack
 
 - **Backend Framework:** FastAPI (Python 3.11)
-- **Database Layer:** SQLite with SQLAlchemy ORM
+- **Database Layer:** PostgreSQL 15 + PostGIS with SQLAlchemy & GeoAlchemy2
 - **Frontend Framework:** React (Vite), Tailwind CSS (v4)
 - **Maps & Routing:** React-Leaflet
 - **Data Visualization:** Recharts
@@ -24,7 +24,7 @@ Boot up the entire stack using Docker. The backend database is volume-mounted so
 docker-compose up -d --build
 ```
 
-- **Frontend Application:** [http://localhost:80](http://localhost:80)
+- **Frontend Application:** [http://localhost:5173](http://localhost:5173)
 - **Backend API & Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ## 📋 Demo Walkthrough for Evaluators
@@ -32,22 +32,22 @@ docker-compose up -d --build
 This prototype features an end-to-end "Citizen-to-Bank" application loop. Follow these steps to evaluate the core innovations:
 
 ### 1. The Citizen Onboarding & AI Abstraction
-1. Navigate to the **Apply Now** wizard (`http://localhost:80/apply`).
-2. **OCR Simulation:** Click the "Simulate Document Upload" button to demonstrate how the system auto-extracts citizen metadata (Age, Income, Category) to bypass manual data entry hurdles.
-3. **Voice Input:** On the loan amount step, try clicking the microphone icon to test the Speech-to-Amount feature (supports English and Hindi numerical spoken inputs).
-4. **Gap Analysis:** Observe the final "Readiness Score" which assesses documentation completeness and flags missing dependencies (e.g., missing Udyam Registration).
+1. Navigate to the **Apply Now** wizard (`http://localhost:5173/apply`).
+2. **Citizen Profile:** Enter demographic and business profile details (Age, Category, Income, Domain).
+3. **Gap Analysis:** Observe the final "Readiness Score" which assesses documentation completeness and flags missing dependencies (e.g., missing Udyam Registration).
 
 ### 2. The Moratorium Visualizer
-1. Once matched to a scheme (e.g., NSFDC Micro Finance), proceed to the **Citizen Dashboard** (`http://localhost:80/`).
+1. Once matched to a scheme (e.g., NSFDC Micro Finance), proceed to the **Citizen Dashboard** (`http://localhost:5173/`).
 2. Adjust the **Moratorium Period** slider on the left.
 3. Notice how the Recharts Stacked Bar Chart recalculates and visually shifts the "Interest-Only" repayment blocks vs standard EMI blocks, giving the citizen immediate clarity on their repayment schedule.
 
 ### 3. The Bank Officer Admin Portal & NPA Routing Loop
-1. Open a new tab and navigate to the **Admin Portal** from the sidebar (`http://localhost:80/admin/bank`).
-2. Look at the **Fund Utilization / NPA Simulator** panel.
-3. **The Bypass Demo:** Drag the NPA slider for a specific bank branch (e.g., "State Bank of India, Hooghly") past the **8.0% threshold**.
-4. A critical red alert will appear: *"Geospatial router will now bypass this branch for new citizens."*
-5. **Verify the Loop:** Go back to your Citizen Dashboard tab and refresh. The map on the right will now exclude that branch from its 100km radius search, effectively halting new loan routing to underperforming branches.
+1. Click **Sign In / Register** in the bottom sidebar, choose **Sign up**, and select the **Bank Admin (Officer)** role (or sign in if an account was already created).
+2. Navigate to the **Admin Portal** from the sidebar (`http://localhost:5173/admin/bank`).
+3. Look at the **Fund Utilization / NPA Simulator** panel.
+4. **The Bypass Demo:** Drag the NPA slider for a specific bank branch (e.g., "Srei Infrastructure Finance" or "Bangiya Gramin Vikash Bank") past the **8.0% threshold**.
+5. A critical red alert will appear: *"Geospatial router will now bypass this branch for new citizens."*
+6. **Verify the Loop:** Go back to your Citizen Dashboard tab and refresh. The map on the right will now exclude that branch from its 100km radius search, effectively halting new loan routing to underperforming branches.
 
 ### 4. Multilingual Support & Dossier Export
 1. Use the **Language Toggle** at the bottom of the sidebar to switch the core UI between English and Hindi, demonstrating the accessibility layer.

@@ -3,12 +3,14 @@
  */
 
 import { useState, useRef, useCallback } from 'react'
-import { matchScheme } from '../api'
+import { useNavigate } from 'react-router-dom'
+import { matchScheme, createApplication, getPartners } from '../api'
 import { useLanguage } from '../context/LanguageContext'
+import { useAuth } from '../context/AuthContext'
 import {
   ChevronRight, ChevronLeft,
   CheckCircle2, AlertTriangle, ExternalLink, BadgePercent,
-  Loader2, X,
+  Loader2, X, FileCheck,
 } from 'lucide-react'
 import {
   RadialBarChart, RadialBar, PolarAngleAxis, ResponsiveContainer,
@@ -224,10 +226,14 @@ function Step2({ form, setForm, onNext, onBack }) {
 
 function Step3({ form, onBack }) {
   const { t } = useLanguage()
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [called, setCalled] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(null)
 
   const runMatch = async () => {
     setLoading(true); setError(null)
@@ -388,6 +394,61 @@ function Step3({ form, onBack }) {
                 </div>
               )}
 
+              {submitError && (
+                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-xl text-sm">
+                  {submitError}
+                </div>
+              )}
+
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100">Ready to Submit Application?</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {user 
+                      ? 'Submit your dossier to participating partner branches for direct officer verification.'
+                      : 'Please sign in or register to submit and track your loan application.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!user) {
+                      alert('Please sign in or register to submit your loan application.')
+                      return
+                    }
+                    setSubmitting(true)
+                    setSubmitError(null)
+                    try {
+                      const partners = await getPartners(true)
+                      const partnerId = partners[0]?.id
+                      if (!partnerId) {
+                        throw new Error('No active channel partner branch available.')
+                      }
+                      await createApplication({
+                        user_id: user.id,
+                        scheme_id: result.matched_scheme.id,
+                        partner_id: partnerId,
+                        amount: Number(form.requested_amount),
+                        tenure_months: Number(form.tenure_months || 24),
+                        moratorium_months: Number(result.matched_scheme.min_moratorium_months || 3),
+                        status: 'Pending'
+                      })
+                      navigate('/applications')
+                    } catch (err) {
+                      setSubmitError(err?.response?.data?.detail || err.message)
+                    } finally {
+                      setSubmitting(false)
+                    }
+                  }}
+                  disabled={submitting}
+                  className="btn-primary py-3 px-6 text-sm gap-2 shrink-0 shadow-lg shadow-blue-500/20"
+                >
+                  {submitting ? <Loader2 size={16} className="animate-spin" /> : <FileCheck size={16} />}
+                  Submit Application
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+
 
             </>
           )}
@@ -416,8 +477,16 @@ const EMPTY_FORM = {
 
 export default function Apply() {
   const { t } = useLanguage()
+  const { user } = useAuth()
   const [step, setStep] = useState(1)
-  const [form, setForm] = useState(EMPTY_FORM)
+  const [form, setForm] = useState(() => ({
+    ...EMPTY_FORM,
+    name: user?.name || '',
+    category: (user?.category && user.category !== 'General') ? user.category : '',
+    annual_income: user?.annual_income ? String(user.annual_income) : '',
+    gender: (user?.gender && user.gender !== 'Other') ? user.gender : '',
+    age: user?.age ? String(user.age) : '',
+  }))
 
   const STEPS = [
     { label: t('stepProfile') },

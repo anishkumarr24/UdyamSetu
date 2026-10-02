@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import { adminGetApplications, adminSimulateNpa, getPartners } from '../api'
+import { adminGetApplications, adminSimulateNpa, getPartners, updateApplicationStatus } from '../api'
 import { useLanguage } from '../context/LanguageContext'
 import {
   Loader2, AlertTriangle, CheckCircle2, ShieldAlert,
@@ -128,8 +128,14 @@ function ApplicationsTable() {
       .finally(() => setLoading(false))
   }, [])
 
-  const handleStatusChange = (id, val) => {
+  const handleStatusChange = async (id, val) => {
     setStatusMap(m => ({ ...m, [id]: val }))
+    try {
+      const dbStatus = val.replace(' ', '_')
+      await updateApplicationStatus(id, dbStatus)
+    } catch (e) {
+      console.warn('Status update not persisted to DB (might be mock ID):', e?.message)
+    }
   }
 
   if (loading) return (

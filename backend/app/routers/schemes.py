@@ -4,6 +4,7 @@ from typing import List
 
 from app import models, schemas
 from app.database import get_db
+from app.security import require_role
 
 router = APIRouter(prefix="/schemes", tags=["schemes"])
 
@@ -21,7 +22,8 @@ def get_scheme(scheme_id: str, db: Session = Depends(get_db)):
     return scheme
 
 
-@router.post("/", response_model=schemas.SchemeRead, status_code=201)
+@router.post("/", response_model=schemas.SchemeRead, status_code=201,
+             dependencies=[Depends(require_role("bank_admin"))])
 def create_scheme(payload: schemas.SchemeCreate, db: Session = Depends(get_db)):
     import uuid
     db_scheme = models.Scheme(id=str(uuid.uuid4()), **payload.model_dump())
@@ -31,7 +33,8 @@ def create_scheme(payload: schemas.SchemeCreate, db: Session = Depends(get_db)):
     return db_scheme
 
 
-@router.put("/{scheme_id}", response_model=schemas.SchemeRead)
+@router.put("/{scheme_id}", response_model=schemas.SchemeRead,
+            dependencies=[Depends(require_role("bank_admin"))])
 def update_scheme(scheme_id: str, payload: schemas.SchemeCreate, db: Session = Depends(get_db)):
     scheme = db.query(models.Scheme).filter(models.Scheme.id == scheme_id).first()
     if not scheme:
@@ -43,7 +46,8 @@ def update_scheme(scheme_id: str, payload: schemas.SchemeCreate, db: Session = D
     return scheme
 
 
-@router.delete("/{scheme_id}", status_code=204)
+@router.delete("/{scheme_id}", status_code=204,
+               dependencies=[Depends(require_role("bank_admin"))])
 def delete_scheme(scheme_id: str, db: Session = Depends(get_db)):
     scheme = db.query(models.Scheme).filter(models.Scheme.id == scheme_id).first()
     if not scheme:

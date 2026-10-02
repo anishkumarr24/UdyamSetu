@@ -28,6 +28,7 @@ class UserCreate(UserBase):
 class UserRead(UserBase):
     model_config = ConfigDict(from_attributes=True)
     id: str
+    role: Optional[str] = "citizen"
 
 
 # ── Scheme ────────────────────────────────────────────────────────────────────
@@ -95,3 +96,6 @@ class LoanApplicationRead(LoanApplicationBase):
     model_config = ConfigDict(from_attributes=True)
     id: str
     created_at: datetime
+    applicant_name: Optional[str] = None
+    scheme_name: Optional[str] = None
+    partner_name: Optional[str] = None

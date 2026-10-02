@@ -32,8 +32,8 @@ const translations = {
     continueBtn: "Continue",
     backBtn: "Back",
     
-    businessNeedsTitle: "Business Needs & Voice Input",
-    businessNeedsDesc: "Tell us what you need. Speak in Hindi or English — we'll understand.",
+    businessNeedsTitle: "Business Needs",
+    businessNeedsDesc: "Tell us about your business requirements and loan details.",
     projectDomain: "Project Domain",
     selectDomain: "Select domain…",
     domainTailoring: "Tailoring",
@@ -49,10 +49,6 @@ const translations = {
     domainFisheries: "Fisheries",
     requestedAmount: "Requested Amount (₹)",
     tenure: "Preferred Loan Tenure (months)",
-    voiceStop: "Stop",
-    voiceBtn: "Voice",
-    listening: "Listening… speak your amount in Hindi or English",
-    heard: "Heard: ",
     analyseBtn: "Analyse Eligibility",
     reqAmountMsg: "Requested amount: ",
     
@@ -168,8 +164,8 @@ const translations = {
     continueBtn: "आगे बढ़ें",
     backBtn: "पीछे",
     
-    businessNeedsTitle: "व्यवसाय की आवश्यकताएं और वॉयस इनपुट",
-    businessNeedsDesc: "हमें बताएं आपको क्या चाहिए। हिंदी या अंग्रेजी में बोलें — हम समझ जाएंगे।",
+    businessNeedsTitle: "व्यवसाय की आवश्यकताएं",
+    businessNeedsDesc: "हमें अपनी व्यावसायिक आवश्यकताओं और ऋण विवरण के बारे में बताएं।",
     projectDomain: "परियोजना क्षेत्र (डोमेन)",
     selectDomain: "क्षेत्र चुनें…",
     domainTailoring: "सिलाई",
@@ -185,10 +181,6 @@ const translations = {
     domainFisheries: "मत्स्य पालन",
     requestedAmount: "अनुरोधित राशि (₹)",
     tenure: "पसंदीदा ऋण अवधि (महीने)",
-    voiceStop: "रोकें",
-    voiceBtn: "बोलें",
-    listening: "सुन रहे हैं… हिंदी या अंग्रेजी में अपनी राशि बोलें",
-    heard: "सुना गया: ",
     analyseBtn: "पात्रता का विश्लेषण करें",
     reqAmountMsg: "अनुरोधित राशि: ",
     

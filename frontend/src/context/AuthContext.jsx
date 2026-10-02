@@ -44,8 +44,12 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
+  const isAdmin = user?.role === 'bank_admin'
+  const isCitizen = user?.role === 'citizen'
+  const isAuthenticated = Boolean(user)
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, isAdmin, isCitizen, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   )

@@ -19,6 +19,15 @@ function ProtectedAdminRoute({ children }) {
   return children
 }
 
+function ProtectedAuthRoute({ children }) {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  if (!user) {
+    return <Navigate to="/" replace />
+  }
+  return children
+}
+
 export default function App() {
   return (
     <AuthProvider>
@@ -32,8 +41,8 @@ export default function App() {
             <Route path="/"             element={<Dashboard />}    />
             <Route path="/schemes"      element={<Schemes />}      />
             <Route path="/partners"     element={<Partners />}     />
-            <Route path="/users"        element={<Users />}        />
-            <Route path="/applications" element={<Applications />} />
+            <Route path="/users"        element={<ProtectedAdminRoute><Users /></ProtectedAdminRoute>}        />
+            <Route path="/applications" element={<ProtectedAuthRoute><Applications /></ProtectedAuthRoute>} />
             <Route path="/apply"        element={<Apply />}        />
             <Route path="/admin/bank"   element={<ProtectedAdminRoute><Admin /></ProtectedAdminRoute>} />
           </Routes>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { X, Loader2 } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
@@ -7,6 +8,7 @@ import { useLanguage } from '../context/LanguageContext'
 export default function LoginModal({ isOpen, onClose }) {
   const { t } = useLanguage()
   const { login, register } = useAuth()
+  const navigate = useNavigate()
   const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -15,7 +17,8 @@ export default function LoginModal({ isOpen, onClose }) {
     name: '',
     email: '',
     password: '',
-    role: 'citizen'
+    role: 'citizen',
+    admin_secret: ''
   })
 
   if (!isOpen) return null
@@ -27,12 +30,21 @@ export default function LoginModal({ isOpen, onClose }) {
     try {
       if (isLogin) {
         await login(form.email, form.password)
+        onClose()
+        navigate('/')
       } else {
         await register(form)
+        onClose()
+        navigate('/')
       }
-      onClose()
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message)
+      const detail = err?.response?.data?.detail
+      if (Array.isArray(detail)) {
+        // FastAPI 422 validation errors: [{type, loc, msg, input, ctx}, ...]
+        setError(detail.map(d => d.msg).join('. '))
+      } else {
+        setError(detail || err.message || 'Something went wrong')
+      }
     } finally {
       setLoading(false)
     }
@@ -110,15 +122,32 @@ export default function LoginModal({ isOpen, onClose }) {
 
           {!isLogin && (
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Role</label>
+              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Account Role</label>
               <select
                 className={inputCls}
                 value={form.role}
                 onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
               >
-                <option value="citizen">Citizen (Beneficiary)</option>
-                <option value="bank_admin">Bank Admin (Officer)</option>
+                <option value="citizen">Citizen (Beneficiary Applicant)</option>
+                <option value="bank_admin">Bank Admin (Credit Officer)</option>
               </select>
+            </div>
+          )}
+
+          {!isLogin && form.role === 'bank_admin' && (
+            <div>
+              <div className="flex justify-between items-baseline mb-1">
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400">Officer Secret Passcode</label>
+                <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">Demo passcode: admin123</span>
+              </div>
+              <input
+                type="password"
+                required
+                className={inputCls}
+                value={form.admin_secret}
+                onChange={e => setForm(f => ({ ...f, admin_secret: e.target.value }))}
+                placeholder="Enter authorized officer passcode"
+              />
             </div>
           )}
 

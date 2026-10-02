@@ -310,7 +310,47 @@ def calculate_emi(req: EMIRequest):
 def find_partners(req: FindPartnersRequest, db: Session = Depends(get_db)):
     from sqlalchemy import text
 
-    radius_m = req.radius_km * 1000.0
+    dialect = db.get_bind().dialect.name
+    if dialect == "sqlite":
+        import math
+        partners = db.query(models.ChannelPartner).filter(
+            models.ChannelPartner.is_active == True,
+            models.ChannelPartner.npa_percentage <= 8.0,
+        ).all()
+        results = []
+        for p in partners:
+            # Fallback coordinates for demo partners if location column is not spatial
+            plat = getattr(p, "lat", None) or 22.975
+            plng = getattr(p, "lng", None) or 88.434
+            if p.location is not None:
+                from geoalchemy2.shape import to_shape
+                try:
+                    pt = to_shape(p.location)
+                    plat, plng = pt.y, pt.x
+                except Exception:
+                    pass
+            dlat = math.radians(plat - req.user_lat)
+            dlon = math.radians(plng - req.user_lng)
+            a = math.sin(dlat / 2)**2 + math.cos(math.radians(req.user_lat)) * math.cos(math.radians(plat)) * math.sin(dlon / 2)**2
+            c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+            dist_km = 6371.0 * c
+            if dist_km <= req.radius_km:
+                results.append(
+                    PartnerResult(
+                        id=p.id,
+                        name=p.name,
+                        partner_type=p.partner_type,
+                        lat=plat,
+                        lng=plng,
+                        npa_percentage=p.npa_percentage,
+                        is_active=p.is_active,
+                        contact_phone=p.contact_phone,
+                        contact_email=p.contact_email,
+                        distance_km=_round2(dist_km),
+                    )
+                )
+        results.sort(key=lambda r: r.distance_km)
+        return FindPartnersResponse(partners=results, total_found=len(results))
 
     # Native PostGIS query: filter active/healthy partners within radius,
     # compute distance via ST_DistanceSphere, sort ascending.
@@ -341,7 +381,7 @@ def find_partners(req: FindPartnersRequest, db: Session = Depends(get_db)):
 
     rows = db.execute(
         sql,
-        {"user_lat": req.user_lat, "user_lng": req.user_lng, "radius_m": radius_m},
+        {"user_lat": req.user_lat, "user_lng": req.user_lng, "radius_m": req.radius_km * 1000},
     ).mappings().all()
 
     results = [
@@ -395,8 +435,33 @@ MOCK_ADMIN_APPLICATIONS = [
 @router.get("/admin/applications", response_model=List[AdminApplication],
             summary="List all submitted applications (admin)",
             dependencies=[Depends(require_role("bank_admin"))])
-def admin_get_applications():
-    return MOCK_ADMIN_APPLICATIONS
+def admin_get_applications(db: Session = Depends(get_db)):
+    db_apps = db.query(models.LoanApplication).order_by(models.LoanApplication.created_at.desc()).all()
+    if not db_apps:
+        return MOCK_ADMIN_APPLICATIONS
+
+    results = []
+    for a in db_apps:
+        u = db.query(models.User).filter(models.User.id == a.user_id).first()
+        s = db.query(models.Scheme).filter(models.Scheme.id == a.scheme_id).first()
+        domain = "Self-Employment"
+        if u and u.project_domain and not u.project_domain.startswith("__email__"):
+            domain = u.project_domain
+        results.append(
+            AdminApplication(
+                id=a.id,
+                applicant_name=u.name if u else "Applicant",
+                domain=domain,
+                requested_amount=a.amount,
+                matched_scheme=s.name if s else "NSFDC Scheme",
+                readiness_score=int(u.readiness_score) if (u and u.readiness_score > 0) else 80,
+                status=a.status.replace("_", " "),
+                submitted_on=a.created_at.strftime("%Y-%m-%d") if a.created_at else "2026-10-02",
+                category=u.category if u else "SC",
+                annual_income=u.annual_income if u else 180000.0,
+            )
+        )
+    return results
 
 
 # ────────────────────────────────────────────────────────────────────────────

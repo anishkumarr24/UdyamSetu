@@ -172,58 +172,90 @@ if existing_schemes == 0:
 else:
     print(f"[SKIP] Schemes already seeded ({existing_schemes} rows).")
 
-# ── Channel Partners (via raw SQL to use ST_SetSRID / ST_MakePoint) ──────────
+# ── Channel Partners ─────────────────────────────────────────────────────────
 if existing_partners == 0:
     for (name, p_type, lat, lng, npa, active, phone, email) in _PARTNER_DATA:
-        db.execute(
-            text("""
-                INSERT INTO channel_partners
-                    (id, name, partner_type, location,
-                     npa_percentage, is_active, contact_phone, contact_email)
-                VALUES (
-                    :id, :name, :p_type,
-                    ST_SetSRID(ST_MakePoint(:lng, :lat), 4326),
-                    :npa, :active, :phone, :email
-                )
-            """),
-            {
-                "id": _uid(), "name": name, "p_type": p_type,
-                "lat": lat, "lng": lng,
-                "npa": npa, "active": active,
-                "phone": phone, "email": email,
-            },
-        )
+        if engine.dialect.name == "sqlite":
+            p = ChannelPartner(
+                id=_uid(),
+                name=name,
+                partner_type=p_type,
+                npa_percentage=npa,
+                is_active=active,
+                contact_phone=phone,
+                contact_email=email,
+            )
+            db.add(p)
+        else:
+            db.execute(
+                text("""
+                    INSERT INTO channel_partners
+                        (id, name, partner_type, location,
+                         npa_percentage, is_active, contact_phone, contact_email)
+                    VALUES (
+                        :id, :name, :p_type,
+                        ST_SetSRID(ST_MakePoint(:lng, :lat), 4326),
+                        :npa, :active, :phone, :email
+                    )
+                """),
+                {
+                    "id": _uid(), "name": name, "p_type": p_type,
+                    "lat": lat, "lng": lng,
+                    "npa": npa, "active": active,
+                    "phone": phone, "email": email,
+                },
+            )
+    db.commit()
     print(f"[OK] Inserted {len(_PARTNER_DATA)} channel partners.")
 else:
     print(f"[SKIP] Channel partners already seeded ({existing_partners} rows).")
 
-# ── Sample Users (via raw SQL to use ST_SetSRID / ST_MakePoint) ──────────────
+# ── Sample Users ──────────────────────────────────────────────────────────────
 if existing_users == 0:
     for (name, age, gender, cat, income, domain,
          amount, lat, lng, udyam, caste, inc_cert, role) in _USER_DATA:
-        db.execute(
-            text("""
-                INSERT INTO users
-                    (id, name, age, gender, category, annual_income,
-                     project_domain, requested_amount, location,
-                     readiness_score, has_udyam, has_caste_cert,
-                     has_income_cert, hashed_password, role)
-                VALUES (
-                    :id, :name, :age, :gender, :cat, :income,
-                    :domain, :amount,
-                    ST_SetSRID(ST_MakePoint(:lng, :lat), 4326),
-                    0.0, :udyam, :caste, :inc_cert, NULL, :role
-                )
-            """),
-            {
-                "id": _uid(), "name": name, "age": age,
-                "gender": gender, "cat": cat, "income": income,
-                "domain": domain, "amount": amount,
-                "lat": lat, "lng": lng,
-                "udyam": udyam, "caste": caste, "inc_cert": inc_cert,
-                "role": role,
-            },
-        )
+        if engine.dialect.name == "sqlite":
+            u = User(
+                id=_uid(),
+                name=name,
+                age=age,
+                gender=gender,
+                category=cat,
+                annual_income=income,
+                project_domain=domain,
+                requested_amount=amount,
+                readiness_score=0.0,
+                has_udyam=udyam,
+                has_caste_cert=caste,
+                has_income_cert=inc_cert,
+                role=role,
+            )
+            db.add(u)
+        else:
+            db.execute(
+                text("""
+                    INSERT INTO users
+                        (id, name, age, gender, category, annual_income,
+                         project_domain, requested_amount, location,
+                         readiness_score, has_udyam, has_caste_cert,
+                         has_income_cert, hashed_password, role)
+                    VALUES (
+                        :id, :name, :age, :gender, :cat, :income,
+                        :domain, :amount,
+                        ST_SetSRID(ST_MakePoint(:lng, :lat), 4326),
+                        0.0, :udyam, :caste, :inc_cert, NULL, :role
+                    )
+                """),
+                {
+                    "id": _uid(), "name": name, "age": age,
+                    "gender": gender, "cat": cat, "income": income,
+                    "domain": domain, "amount": amount,
+                    "lat": lat, "lng": lng,
+                    "udyam": udyam, "caste": caste, "inc_cert": inc_cert,
+                    "role": role,
+                },
+            )
+    db.commit()
     print(f"[OK] Inserted {len(_USER_DATA)} sample users.")
 else:
     print(f"[SKIP] Users already seeded ({existing_users} rows).")

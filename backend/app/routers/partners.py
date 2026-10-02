@@ -6,6 +6,7 @@ from geoalchemy2.elements import WKTElement
 
 from app import models, schemas
 from app.database import get_db
+from app.security import require_role
 
 router = APIRouter(prefix="/partners", tags=["partners"])
 
@@ -36,7 +37,8 @@ def get_partner(partner_id: str, db: Session = Depends(get_db)):
     return partner
 
 
-@router.post("/", response_model=schemas.ChannelPartnerRead, status_code=201)
+@router.post("/", response_model=schemas.ChannelPartnerRead, status_code=201,
+             dependencies=[Depends(require_role("bank_admin"))])
 def create_partner(payload: schemas.ChannelPartnerCreate, db: Session = Depends(get_db)):
     import uuid
     data = payload.model_dump()
@@ -54,7 +56,8 @@ def create_partner(payload: schemas.ChannelPartnerCreate, db: Session = Depends(
     return db_partner
 
 
-@router.put("/{partner_id}", response_model=schemas.ChannelPartnerRead)
+@router.put("/{partner_id}", response_model=schemas.ChannelPartnerRead,
+            dependencies=[Depends(require_role("bank_admin"))])
 def update_partner(partner_id: str, payload: schemas.ChannelPartnerCreate, db: Session = Depends(get_db)):
     partner = db.query(models.ChannelPartner).filter(models.ChannelPartner.id == partner_id).first()
     if not partner:
@@ -75,7 +78,8 @@ def update_partner(partner_id: str, payload: schemas.ChannelPartnerCreate, db: S
     return partner
 
 
-@router.delete("/{partner_id}", status_code=204)
+@router.delete("/{partner_id}", status_code=204,
+               dependencies=[Depends(require_role("bank_admin"))])
 def delete_partner(partner_id: str, db: Session = Depends(get_db)):
     partner = db.query(models.ChannelPartner).filter(models.ChannelPartner.id == partner_id).first()
     if not partner:

@@ -25,11 +25,21 @@ export default function Sidebar() {
 
   // Filter links based on role
   const visibleLinks = links.filter(link => {
-    if (link.to.startsWith('/admin')) {
+    if (link.to === '/admin/bank' || link.to === '/users') {
       return user && user.role === 'bank_admin'
+    }
+    if (link.to === '/applications') {
+      return Boolean(user)
     }
     return true
   })
+
+  const getLinkLabel = (to, labelKey) => {
+    if (to === '/applications') {
+      return user?.role === 'bank_admin' ? 'Review Applications' : 'My Applications'
+    }
+    return t(labelKey)
+  }
 
   return (
     <aside className="fixed inset-y-0 left-0 w-60 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 transition-colors">
@@ -60,28 +70,30 @@ export default function Sidebar() {
             }
           >
             <Icon size={17} />
-            {t(labelKey)}
+            {getLinkLabel(to, labelKey)}
           </NavLink>
         ))}
       </nav>
 
       {/* Footer */}
       <div className="px-3 pb-4 pt-2 border-t border-slate-200 dark:border-slate-800">
-        {/* Apply CTA */}
-        <NavLink
-          to={ctaLink.to}
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold mb-4 transition-colors duration-100 ${
-              isActive
-                ? 'bg-blue-700 text-white'
-                : 'bg-blue-700 text-white hover:bg-blue-800'
-            }`
-          }
-        >
-          <ctaLink.icon size={17} />
-          {t(ctaLink.labelKey)}
-          <span className="ml-auto text-[9px] bg-white/20 px-1.5 py-0.5 rounded-full">NEW</span>
-        </NavLink>
+        {/* Apply CTA – citizens only */}
+        {(!user || user.role === 'citizen') && (
+          <NavLink
+            to={ctaLink.to}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold mb-4 transition-colors duration-100 ${
+                isActive
+                  ? 'bg-blue-700 text-white'
+                  : 'bg-blue-700 text-white hover:bg-blue-800'
+              }`
+            }
+          >
+            <ctaLink.icon size={17} />
+            {t(ctaLink.labelKey)}
+            <span className="ml-auto text-[9px] bg-white/20 px-1.5 py-0.5 rounded-full">NEW</span>
+          </NavLink>
+        )}
         
         {/* Auth Section */}
         {user ? (

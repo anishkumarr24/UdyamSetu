@@ -29,6 +29,7 @@ class RegisterRequest(BaseModel):
     email: str                       # used as login username
     password: str
     role: Literal["citizen", "bank_admin"] = "citizen"
+    admin_secret: Optional[str]     = None
     # Optional profile fields (can be filled later on /apply)
     age: Optional[int]              = None
     gender: Optional[str]           = None
@@ -102,6 +103,15 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
             status_code=status.HTTP_409_CONFLICT,
             detail="An account with that email already exists.",
         )
+
+    if payload.role == "bank_admin":
+        import os
+        expected_secret = os.getenv("ADMIN_SECRET", "admin123")
+        if payload.admin_secret != expected_secret:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid admin passcode. Only authorized bank officers can register as Bank Admin.",
+            )
 
     user = models.User(
         id               = str(uuid.uuid4()),

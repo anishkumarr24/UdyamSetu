@@ -24,7 +24,7 @@ services:
     volumes:
       - udyamsetu_data:/app/data
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/udyamsetu
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/udyamsetu
     depends_on:
       db:
         condition: service_healthy
